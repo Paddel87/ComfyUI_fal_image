@@ -1,0 +1,68 @@
+{
+  "1": {
+    "inputs": {
+      "model": "FLUX Dev"
+    },
+    "class_type": "FALModelSelectImage",
+    "_meta": {
+      "title": "FAL Model Select (Image)"
+    }
+  },
+  "2": {
+    "inputs": {
+      "model_id": ["1", 0],
+      "prompt": "portrait of a young woman, natural lighting, soft expression",
+      "width": 768,
+      "height": 1024,
+      "seed": 42,
+      "num_inference_steps": 24,
+      "guidance_scale": 3.5,
+      "num_images": 1,
+      "enable_safety_checker": true,
+      "timeout_sec": 60,
+      "retries": 2
+    },
+    "class_type": "FALText2Image",
+    "_meta": {
+      "title": "FAL Text2Image"
+    }
+  },
+  "3": {
+    "inputs": {
+      "context_id": ["2", 2]
+    },
+    "class_type": "FALContextStore",
+    "_meta": {
+      "title": "FAL Context Store"
+    }
+  },
+  "4": {
+    "inputs": {
+      "model_id": ["1", 0],
+      "image": ["2", 0],
+      "prompt": "same woman, wearing elegant evening dress, golden hour lighting",
+      "strength": 0.3,
+      "seed": 123,
+      "num_inference_steps": 20,
+      "guidance_scale": 3.0,
+      "context_id": ["3", 0],
+      "enable_safety_checker": true,
+      "timeout_sec": 60,
+      "retries": 2
+    },
+    "class_type": "FALImage2Image",
+    "_meta": {
+      "title": "FAL Image2Image"
+    }
+  },
+  "5": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": ["4", 0]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  }
+}

@@ -42,6 +42,8 @@ Full-featured ComfyUI custom-node pack for [fal.ai](https://fal.ai) image genera
 - **I2I**: Load Image → Image2Image → Save Image  
 - **Kontext**: T2I → Context Store → (optional) I2I with same context
 
+Ready-made JSON: [`workflows/minimal_kontext_img2img.json`](workflows/minimal_kontext_img2img.json) – import via ComfyUI "Load" button.
+
 ## Advanced Settings (Text2Image / Image2Image)
 | Socket | Type | Default | Note |
 |--------|------|---------|------|
@@ -58,6 +60,20 @@ Full-featured ComfyUI custom-node pack for [fal.ai](https://fal.ai) image genera
 
 ## Safety & NSFW
 Setting `safety_mode = disabled` plus `safety_tolerance = 6` (max) turns off the built-in filter. Use responsibly and comply with fal.ai terms.
+
+**Guardrails**: Some endpoints (e.g. FLUX Pro v1.1) enforce safety regardless of client flags. The node automatically falls back to `safety_mode = enabled` when the API rejects a disabled request, logs the switch, and continues generation.
+
+## Testing / Verification
+The following tests confirm correct node behaviour:
+
+| Test | Purpose | Expected Result |
+|------|---------|-----------------|
+| **Context-ID Reuse** | Kontext continuity | Same person/identity across multiple runs with identical features |
+| **Img2Img Low-Strength** | Surface-only edits | Background/details change, core identity preserved (strength 0.2-0.4) |
+| **Logging Output** | Traceability | Every request logs `model_id`, `seed`, `safety_applied` plus request metadata |
+
+Run the standalone verifier:  
+`python ComfyUI_fal_image/tests/demo_flux.py` (needs `FAL_KEY`).
 
 ## Examples
 ### Environment Launch (Windows)
