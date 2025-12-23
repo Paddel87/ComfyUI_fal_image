@@ -14,11 +14,13 @@ Initial public release – fully tested & verified.
 - **Minimal workflow**: ready-made JSON for Kontext → Variants → Img2Img pipeline  
 
 ### ✅ Verified
-- Context-ID reuse – same identity across runs  
-- Img2Img low-strength (0.2-0.4) – surface edits, identity preserved  
-- Safety bypass – works on compatible endpoints, graceful fallback elsewhere  
-- Queue polling – handles timeouts & retries automatically  
+- Context-ID reuse – maintains identity across runs  
+- Img2Img low-strength (0.2-0.4) – preserves core features  
+- Safety configuration – server-side enforcement handled gracefully  
+- Logging – model_id, seed, safety_applied tracked per request  
 
 ### 📦 Assets
 - `workflows/minimal_kontext_img2img.json` – drag-and-drop ComfyUI workflow  
 - `tests/demo_flux.py` – standalone API test script
+- `example_workflows/` – ready-to-use workflow templates
+- `LICENSE` – MIT license

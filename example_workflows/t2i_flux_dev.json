@@ -1,0 +1,40 @@
+{
+  "1": {
+    "inputs": {
+      "model": "FLUX Dev"
+    },
+    "class_type": "FALModelSelectImage",
+    "_meta": {
+      "title": "FAL Model Select (Image)"
+    }
+  },
+  "2": {
+    "inputs": {
+      "model_id": ["1", 0],
+      "prompt": "a serene mountain landscape at sunrise, photorealistic",
+      "width": 1024,
+      "height": 768,
+      "seed": 12345,
+      "num_inference_steps": 28,
+      "guidance_scale": 3.5,
+      "num_images": 1,
+      "enable_safety_checker": true,
+      "timeout_sec": 60,
+      "retries": 2
+    },
+    "class_type": "FALText2Image",
+    "_meta": {
+      "title": "FAL Text2Image"
+    }
+  },
+  "3": {
+    "inputs": {
+      "filename_prefix": "flux_dev_t2i",
+      "images": ["2", 0]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  }
+}

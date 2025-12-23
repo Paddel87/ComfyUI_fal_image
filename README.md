@@ -1,10 +1,10 @@
 # ComfyUI-fal-Image
 
-Full-featured ComfyUI custom-node pack for [fal.ai](https://fal.ai) image generation (FLUX Dev / Pro / Schnell / Kontext / Redux) with queue polling, automatic retry, timeout handling, safety toggles and native ComfyUI image I/O.
+Full-featured ComfyUI custom-node pack for [fal.ai](https://fal.ai) image generation (FLUX Dev / Pro / Schnell / Kontext / Redux / Schnell-Redux) with queue polling, automatic retry, timeout handling, safety toggles and native ComfyUI image I/O.
 
 ## Features
 - **Text-to-Image**: FLUX Dev, FLUX Pro v1.1, FLUX Pro New, FLUX Schnell
-- **Image-to-Image**: FLUX Pro Kontext, FLUX Kontext Dev, FLUX Pro Kontext Multi, FLUX Schnell Redux
+- **Image-to-Image**: FLUX Pro Kontext, FLUX Kontext Dev, FLUX Pro Kontext Multi, FLUX Schnell Redux (`fal-ai/flux/schnell/redux`)
 - **Model Select Drop-down**: automatic model-id mapping
 - **Queue Polling**: non-blocking requests with configurable timeout & retry
 - **Safety Controls**: enable/disable checker + tolerance per request
@@ -29,13 +29,21 @@ Full-featured ComfyUI custom-node pack for [fal.ai](https://fal.ai) image genera
    - **Config file**: copy `config.example.ini` to `config.ini` and add your key.
 4. Restart ComfyUI – new nodes appear under `fal.ai/Image`.
 
+### Windows Portable / python_embeded
+If you use the ComfyUI standalone build, use its bundled interpreter:
+```powershell
+# in ComfyUI root
+cd python_embeded
+python.exe -m pip install -r ../custom_nodes/ComfyUI_fal_image/requirements.txt
+```
+
 ## Node Overview
 | Node | Description |
 |------|-------------|
 | **FAL Model Select (Image)** | Pick model from drop-down; outputs model-id string. |
-| **FAL Text2Image** | Prompt + size + seed + safety → IMAGE + URL + context-id. |
+| **FAL Text2Image** | Prompt + size + seed + safety → IMAGE + URL + context_id. |
 | **FAL Image2Image** | Reference image + prompt + strength → edited IMAGE + URL. |
-| **FAL Context Store** | Stores/returns a context-id for multi-step Kontext workflows. |
+| **FAL Context Store** | Stores/returns a context_id for multi-step Kontext workflows. |
 
 ## Minimal Workflows
 - **T2I**: Model Select → Text2Image → Save Image  
@@ -43,6 +51,8 @@ Full-featured ComfyUI custom-node pack for [fal.ai](https://fal.ai) image genera
 - **Kontext**: T2I → Context Store → (optional) I2I with same context
 
 Ready-made JSON: [`workflows/minimal_kontext_img2img.json`](workflows/minimal_kontext_img2img.json) – import via ComfyUI "Load" button.
+
+Example workflows: [`example_workflows/`](example_workflows/)
 
 ## Advanced Settings (Text2Image / Image2Image)
 | Socket | Type | Default | Note |
@@ -58,22 +68,21 @@ Ready-made JSON: [`workflows/minimal_kontext_img2img.json`](workflows/minimal_ko
 | `width/height` | INT | 1024 | Output resolution (64-2048). |
 | `strength` | FLOAT | 0.75 | I2I denoise strength. |
 
-## Safety & NSFW
-Setting `safety_mode = disabled` plus `safety_tolerance = 6` (max) turns off the built-in filter. Use responsibly and comply with fal.ai terms.
+## Safety Configuration
+The node exposes three safety modes: `auto`, `enabled`, `disabled`.  
+- `auto` (default): lets the fal endpoint decide.  
+- `enabled`: always requests safety filtering.  
+- `disabled`: requests no filtering; maximum `safety_tolerance` is used.
 
-**Guardrails**: Some endpoints (e.g. FLUX Pro v1.1) enforce safety regardless of client flags. The node automatically falls back to `safety_mode = enabled` when the API rejects a disabled request, logs the switch, and continues generation.
+Server-side enforcement: certain endpoints ignore the client flag and always enable filtering. When this happens the node continues generation and reports the effective mode via the `safety_applied` output field.
 
 ## Testing / Verification
-The following tests confirm correct node behaviour:
+Verified behaviour:
+- Context-ID reuse maintains identity across runs
+- Img2Img low-strength (0.2-0.4) preserves core features
+- `model_id`, `seed`, `safety_applied` logged for every request
 
-| Test | Purpose | Expected Result |
-|------|---------|-----------------|
-| **Context-ID Reuse** | Kontext continuity | Same person/identity across multiple runs with identical features |
-| **Img2Img Low-Strength** | Surface-only edits | Background/details change, core identity preserved (strength 0.2-0.4) |
-| **Logging Output** | Traceability | Every request logs `model_id`, `seed`, `safety_applied` plus request metadata |
-
-Run the standalone verifier:  
-`python ComfyUI_fal_image/tests/demo_flux.py` (needs `FAL_KEY`).
+Run: `python ComfyUI_fal_image/tests/demo_flux.py` (requires `FAL_KEY`)
 
 ## Examples
 ### Environment Launch (Windows)
@@ -87,7 +96,8 @@ os.environ["FAL_KEY"] = "fal-..."
 from ComfyUI_fal_image.fal_client import FalClient
 client = FalClient(os.environ["FAL_KEY"])
 payload = {"prompt":"cyberpunk cat","image_size":{"width":768,"height":512}}
-result, req_id, status = client.run_with_polling("fal-ai/flux/dev", payload, 90, 2)
+result, request_id, status = client.run_with_polling("fal-ai/flux/dev", payload, 90, 2)
+# request_id can be used as context_id for Kontext workflows
 print(result["images"][0]["url"])
 ```
 ### Config File (`config.ini`)

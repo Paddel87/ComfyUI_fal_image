@@ -1,0 +1,49 @@
+{
+  "1": {
+    "inputs": {
+      "model": "FLUX Pro v1.1"
+    },
+    "class_type": "FALModelSelectImage",
+    "_meta": {
+      "title": "FAL Model Select (Image)"
+    }
+  },
+  "2": {
+    "inputs": {
+      "image": "example_input.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "3": {
+    "inputs": {
+      "model_id": ["1", 0],
+      "image": ["2", 0],
+      "prompt": "enhanced version, more detailed textures, improved lighting",
+      "strength": 0.4,
+      "seed": 456,
+      "num_inference_steps": 28,
+      "guidance_scale": 3.5,
+      "enable_safety_checker": true,
+      "timeout_sec": 90,
+      "retries": 2
+    },
+    "class_type": "FALImage2Image",
+    "_meta": {
+      "title": "FAL Image2Image"
+    }
+  },
+  "4": {
+    "inputs": {
+      "filename_prefix": "img2img_detail_pass",
+      "images": ["3", 0]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  }
+}
